@@ -11,14 +11,14 @@ class fx_reverb : public fx_base
 private:
   enum paramName {LEVEL, MIX, FBACK, HICUT, LOCUT, HIDUMP,
     P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19};
-  float param[20] = {50, 50, 1, 50, 50, 30,
+  float param[20] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   const uint16_t paramMax[20] = { 70, 100, 99, 99, 99, 99,
       1,1,1,1,1,1,1,1,1,1,1,1,1,1};
   const uint16_t paramMin[20] = { 30, 0, 0, 10, 1, 10,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   const std::string paramName[20] = {
-      "LEVEL", "MIX", "FBACK",
+      "LEVEL", "MIX", "F.BACK",
       "HI-CUT", "LO-CUT", "HI-DUMP"
       "","","","","","","","","","","","","",""};
   const uint8_t pageMax = 0;
@@ -96,7 +96,7 @@ public:
         param[LEVEL] = dbtovol((float)(FXparam[LEVEL] - 50)); // OUTPUT LEVEL -20...+20dB
         break;
       case 1:
-        param[MIX] = logpot(FXparam[MIX], -20.0f, 20.0f);  // MIX -20...20dB
+        param[MIX] = mixpot(FXparam[MIX], -20.0f); // MIX
         break;
       case 2:
         param[FBACK] = (float)FXparam[FBACK] / 200.0f; // Feedback 0～0.495
@@ -148,7 +148,7 @@ public:
 
     for (uint16_t i = 0; i < BLOCK_SIZE; i++)
     {
-      fxL[i] = lpfIn.process(xL[i]);
+      fxL[i] = 0.25f * lpfIn.process(xL[i]);
 
       // Early Reflection
       del[0].write(fxL[i]);
@@ -193,8 +193,8 @@ public:
       del[8].write(fp - gp);
       del[9].write(fm - gm);
 
-      fxL[i] = 0.2f / param[MIX] * xL[i] + 0.2f * param[MIX] * hpfOutL.process(out_l);
-      fxR[i] = 0.2f / param[MIX] * xL[i] + 0.2f * param[MIX] * hpfOutR.process(out_r);
+      fxL[i] = (1.0f - param[MIX]) * xL[i] + param[MIX] * hpfOutL.process(out_l);
+      fxR[i] = (1.0f - param[MIX]) * xL[i] + param[MIX] * hpfOutR.process(out_r);
 
       xL[i] = bypassL(xL[i], param[LEVEL] * fxL[i]);
       xR[i] = bypassR(xL[i], param[LEVEL] * fxR[i]);

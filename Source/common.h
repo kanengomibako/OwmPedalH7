@@ -5,7 +5,7 @@
 #include <string>
 
 /* 各定数設定 --------------------------*/
-#define PEDAL_NAME "Owm Pedal H7 v0.01"
+#define PEDAL_NAME "Owm Pedal H7 v0.02"
 
 // ブロックサイズ
 #define BLOCK_SIZE 32

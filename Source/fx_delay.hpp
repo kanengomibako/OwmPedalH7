@@ -11,7 +11,7 @@ class fx_delay : public fx_base
 private:
   enum paramName {OUTPUT, ELEVEL, FBACK, DELAYTIME1, DELAYTIME2, HICUT,
     P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19};
-  float param[20] = {0, 0, 50, 50, 0, 0,
+  float param[20] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   const uint16_t paramMax[20] = { 70, 70, 99, 10, 99, 99,
       1,1,1,1,1,1,1,1,1,1,1,1,1,1};

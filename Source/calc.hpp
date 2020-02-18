@@ -53,6 +53,16 @@ inline float logpot(uint16_t pot, float dBmin, float dBmax)
   return dbtovol(p); // dBから倍率へ変換
 }
 
+inline float mixpot(uint16_t pot, float dBmin)
+{
+  // POTの値0～100をMIX倍率へ割り当てる dBminは-6以下の負の値
+  float a = (-6.0f - dBmin) * 0.02f; // dB増加の傾きを計算
+  if      (pot ==   0) return 0.0f;
+  else if (pot <=  50) return dbtovol((float)pot * a + dBmin); // dBmin ～ -6dB
+  else if (pot <  100) return 1.0f - dbtovol((float)(100 - pot) * a + dBmin);
+  else                 return 1.0f;
+}
+
 /* バイパス ポップノイズ対策のため、0.01ずつ音量操作しエフェクト切り替えする--------------*/
 inline float bypassL(float x, float fx)
 {

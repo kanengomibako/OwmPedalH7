@@ -10,7 +10,7 @@ class fx_tremolo : public fx_base
 private:
   enum paramName {LEVEL, RATE, WAVE, DEPTH,
     P4,P5,P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19};
-  float param[20] = {50, 50, 10, 50,
+  float param[20] = {0.0f, 1.0f, 1.0f, 1.0f,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   const uint16_t paramMax[20] = { 70,100,100,100,
       1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};

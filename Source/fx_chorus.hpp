@@ -9,16 +9,16 @@
 class fx_chorus : public fx_base
 {
 private:
-  enum paramName {LEVEL, MIX, MODE, RATE, DEPTH, HICUT,
+  enum paramName {LEVEL, MIX, FBACK, RATE, DEPTH, HICUT,
     P6,P7,P8,P9,P10,P11,P12,P13,P14,P15,P16,P17,P18,P19};
-  float param[20] = {50, 50, 1, 50, 50, 30,
+  float param[20] = {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-  const uint16_t paramMax[20] = { 70,100, 1,100,100, 99,
+  const uint16_t paramMax[20] = { 70,100,99,100,100, 99,
       1,1,1,1,1,1,1,1,1,1,1,1,1,1};
   const uint16_t paramMin[20] = { 30, 0,  0,  0,  0, 10,
       0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   const std::string paramName[20] = {
-      "LEVEL", "MIX", "MODE",
+      "LEVEL", "MIX", "F.BACK",
       "RATE", "DEPTH", "HI-CUT"
       "","","","","","","","","","","","","",""};
   const uint8_t pageMax = 0;
@@ -66,9 +66,9 @@ public:
       case MIX:
         FXparamStr[MIX] = std::to_string(FXparam[MIX]);
         break;
-      case MODE:
-        if (FXparam[MODE]) FXparamStr[MODE] = "CHORUS";
-        else FXparamStr[MODE] = "VIBRATE";
+      case FBACK:
+        FXparamStr[FBACK] = std::to_string(FXparam[FBACK]);
+        FXparamStr[FBACK] += "%";
         break;
       case RATE:
         FXparamStr[RATE] = std::to_string(FXparam[RATE]);
@@ -95,10 +95,10 @@ public:
         param[LEVEL] = dbtovol((float)(FXparam[LEVEL] - 50)); // OUTPUT LEVEL -20...+20dB
         break;
       case 1:
-        param[MIX] = logpot(FXparam[MIX], -10.0f, 10.0f);  // MIX -20...20dB
+        param[MIX] = mixpot(FXparam[MIX], -20.0f);  // MIX
         break;
       case 2:
-        param[MODE] = (float)FXparam[MODE]; // MODE 0 or 1
+        param[FBACK] = (float)FXparam[FBACK] / 100.0f; // Feedback 0～0.99
         break;
       case 3:
         param[RATE] = 0.02f * (105.0f - (float)FXparam[RATE]); // Rate 2s
@@ -131,21 +131,13 @@ public:
 
     for (uint16_t i = 0; i < BLOCK_SIZE; i++)
     {
-      del1.write(hpf1.process(xL[i]));
       float dtime = param[DEPTH] * tri1.output() + 5.0f; // ディレイタイム5~15ms
       fxL[i] = del1.read_lerp(dtime);
       fxL[i] = lpf2nd1.process(fxL[i]);
-      if (param[MODE] > 0.5f) // コーラスモード
-      {
-        fxL[i] = (1.0f / param[MIX]) * xL[i] + param[MIX] * lpf2nd2.process(fxL[i]);
-        fxL[i] = fxL[i] * param[LEVEL] * 0.5f;
-      }
-      else // ビブラートモード
-      {
-        fxL[i] = lpf2nd2.process(fxL[i]);
-        fxL[i] = fxL[i] * param[LEVEL];
-      }
-      xL[i] = bypassL(xL[i], fxL[i]);
+      fxL[i] = lpf2nd2.process(fxL[i]);
+      del1.write(hpf1.process(xL[i]) + param[FBACK] * fxL[i]);
+      fxL[i] = (1.0f - param[MIX]) * xL[i] + param[MIX] * fxL[i];
+      xL[i] = bypassL(xL[i], fxL[i] * param[LEVEL]);
     }
   }
 

@@ -10,7 +10,7 @@ class fx_equalize : public fx_base
 private:
   enum paramName {LEVEL, P1, P2, FREQ1, Q1, GAIN1, FREQ2, Q2, GAIN2, FREQ3, Q3, GAIN3, FREQ4, Q4, GAIN4, FREQ5, Q5, GAIN5,
     P18,P19};
-  float param[20] = {50, 0, 0, 1,1,0,3,1,0,6,1,0,10,1,0,20,1,0,
+  float param[20] = {0.0f,0.0f,0.0f,9.9f,1.0f,0.0f,9.9f,1.0f,0.0f,9.9f,1.0f,0.0f,9.9f,1.0f,0.0f,9.9f,1.0f,0.0f,
       0,0};
   const uint16_t paramMax[20] = {70,1,1,99,99,65,99,99,65,99,99,65,99,99,65,99,99,65,
       1,1};
